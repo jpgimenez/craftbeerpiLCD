@@ -14,7 +14,7 @@ from .contextmanagers import cursor, cleared
 from .gpio import CharLCD as GpioCharLCD
 from i2c import CharLCD
 
-#LCDVERSION = '3.7.22'
+#LCDVERSION = '3.7.23'
 #The LCD-library and LCD-driver are taken from RPLCD Project version 1.0.
 #The documentation:   http://rplcd.readthedocs.io/en/stable/ very good and readable.
 #Git is here:         https://github.com/dbrgn/RPLCD.
@@ -26,7 +26,7 @@ from i2c import CharLCD
 #17.02.2018 add feature to change refresh rate for Multidisplay without CBPI reboot
 #17.02.2018 add feature to change refresh rate for Multidisplay in parameters with choose of value from 1-6s because more than 6s is too much delay in switching actors
 #18.02.2018 improve stability (no value of a temp sensor)
-#
+#13.03.2018 display F or C depending on what is choosed in parameters-unit
 
 @cbpi.initalizer(order=3000)
 def init(cbpi):
@@ -55,6 +55,13 @@ def init(cbpi):
         lcd.create_char(1, cool)
     except:
         cbpi.notify('LCD Address is wrong', 'Change LCD Address in parameters,to detect comand promt in Raspi: sudo i2cdetect -y 1', type = 'danger', timeout=None)
+
+    global lcd_unit
+    try:
+        lcd_unit = cbpi.get_config_parameter("unit", None)
+        cbpi.app.logger.info("LCDDisplay  - unit used %s" % (lcd_unit))
+    except:
+        pass
 
 #end of init    
 
@@ -92,6 +99,12 @@ def set_parameter_id1():
       cbpi.add_config_parameter("LCD_Singledisplay", 1, "number", "Choose Kettle (Number), NO! CBPi reboot required")
       kid1 = cbpi.get_config_parameter('LCD_Singledisplay', None)
   return kid1
+
+def set_lcd_unit():
+    try:
+        slu = cbpi.get_config_parameter("unit", None)
+    except:
+        pass
 
 #beerglass symbol
 bierkrug = (
@@ -156,14 +169,14 @@ def show_multidisplay(refresh):
             line2 = ((u'%s' % (value.name,))[:20])
 
         #line3 
-        line3 = (u"Targ. Temp:%6.2f%s" % (float(value.target_temp),(u"°C")))[:20]
+        line3 = (u"Targ. Temp:%6.2f%s%s" % (float(value.target_temp),(u"°"),(lcd_unit)))[:20]
 
         #line4 needs errorhandling because there may be tempvalue without sensordates and so it is none and than an error is thrown
         try:
-            line4 = (u"Curr. Temp:%6.2f%s" % (float(current_sensor_value),(u"°C")))[:20]
+            line4 = (u"Curr. Temp:%6.2f%s%s" % (float(current_sensor_value),(u"°"),(lcd_unit)))[:20]
         except:
             cbpi.app.logger.info("LCDDisplay  - current_sensor_value exception %s" % (current_sensor_value))
-            line4 = (u"Curr. Temp: %s" % (("No Data")))[:20]
+            line4 = (u"Curr. Temp: %s" % ("No Data"))[:20]
             
         lcd.clear()
         lcd.cursor_pos = (0, 0)
@@ -211,11 +224,11 @@ def show_singlemode(id1):
         line2 = ((u'%s' % (cbpi.cache.get("kettle")[id1].name)).ljust(20)[:20])
 
     #line3
-    line3 = (u"Targ. Temp:%6.2f%s" % (float(cbpi.cache.get("kettle")[id1].target_temp),(u"°C"))).ljust(20)[:20]
+    line3 = (u"Targ. Temp:%6.2f%s%s" % (float(cbpi.cache.get("kettle")[id1].target_temp),(u"°"),(lcd_unit))).ljust(20)[:20]
 
     #line4 needs errorhandling because there may be tempvalue without sensordates and so it is none and than an error is thrown
     try:
-        line4 = (u"Curr. Temp:%6.2f%s" % (float(current_sensor_value_id1),(u"°C"))).ljust(20)[:20]
+        line4 = (u"Curr. Temp:%6.2f%s%s" % (float(current_sensor_value_id1),(u"°"),(lcd_unit))).ljust(20)[:20]
     except:
         cbpi.app.logger.info("LCDDisplay  - singlemode current_sensor_value_id1 exception %s" % (current_sensor_value_id1))
         line4 = (u"Curr. Temp: %s" % (("No Data")))[:20]
@@ -281,11 +294,11 @@ def show_fermentation_multidisplay(refresh):
             pass
         
         #line3    
-        line3 = (u"Targ. Temp:%6.2f%s" % (float(value.target_temp),(u"°C")))[:20]
+        line3 = (u"Targ. Temp:%6.2f%s%s" % (float(value.target_temp),(u"°"),(lcd_unit)))[:20]
         
         #line4 needs errorhandling because there may be tempvalue without sensordates and so it is none and than an error is thrown
         try:
-            line4 = (u"Curr. Temp:%6.2f%s" % (float(current_sensor_value),(u"°C")))[:20]
+            line4 = (u"Curr. Temp:%6.2f%s%s" % (float(current_sensor_value),(u"°"),(lcd_unit)))[:20]
         except:
             cbpi.app.logger.info("LCDDisplay  - fermentmode current_sensor_value exception %s" % (current_sensor_value))
             line4 = (u"Curr. Temp: %s" % (("No Data")))[:20]
