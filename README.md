@@ -12,35 +12,33 @@ There are different modes:
 
 If no brewing process is running the LCD Display will show
 
---CraftBeerPi-Version 
---Brewery-name
---Current IP adress 
---Current date/time
+- CraftBeerPi-Version 
+- Brewery-name
+- Current IP adress 
+- Current date/time
 
 **Multidisplay mode**
 -----------------
 
-The script will loop thru your kettles and display the target and current temperatur. 
-If heater is on, a beerglas symbol will appear in the first row on the right side (not flashing).
-When target-temperature is reached it displayes the remaining time of  the step (rest) too.
+- The script will loop thru your kettles and display the target and current temperatur. 
+- If heater is on, a beerglas symbol will appear in the first row on the right side (not flashing).
+- When target-temperature is reached it displayes the remaining time of the step (rest) too.
 
 **Single mode**
 -----------
 
-Only displayes one kettle but reacts a little bit faster on temperature changes. 
-It displayes the remaining time of
-the step (rest) when target temperature is reached.
-When the heater is "on" a small beerglas is flashing on/off in the first row on the right side.
+- Only displayes one kettle but reacts a little bit faster on temperature changes. 
+- It displayes the remaining time of the step (rest) when target temperature is reached.
+- When the heater is "on" a small beerglas is flashing on/off in the first row on the right side.
 
 **Fermenter mode**
 --------------
-Pretty much the same as multidisplay for all fermenter.
-Displayes the brewname, fermentername, target-temperature, current-temperature
-of each fermenter.
-When the heater or cooler of the fermenter is on it will show a symbol.
+- Pretty much the same as multidisplay for all fermenter.
+- Displayes the brewname, fermentername, target-temperature, current-temperature of each fermenter.
+- When the heater or cooler of the fermenter is on it will show a symbol.
 A beerglas detects heater is on, * means cooler in on.
-The remaining time for each fermenter is shown like in weeks, days, hours. 
-Fermenter mode starts when a fermenter-step of any of the fermenters is starting.
+- The remaining time for each fermenter is shown like in weeks, days, hours. 
+- Fermenter mode starts when a fermenter-step of any of the fermenters is starting.
 
 Parameter
 ---------
@@ -51,9 +49,9 @@ There are several parameter to change in the **CBPi-parameter** menue:
 **LCD_Adress:**    
 This is the adress of the LCD modul. You can detect it by 
 using the following command in the commandbox of the Raspi:   
---sudo i2cdetect -y 1 
+- sudo i2cdetect -y 1 
 or 
---sudo i2cdetect -y 0.
+- sudo i2cdetect -y 0.
 Default is 0x27.
  
  
@@ -94,12 +92,12 @@ It maybe necessary to restart craftbeerpi after adding a new fermenter.
 Sometimes it lastes a long time till the fermenterstep starts running. 
 I don't know why this is happening.
 If the address is right but you still can not see letters displayed:
-  --try to adjust contrast by the screw on the back of the LCD Hardware (I2C Modul)
-  --be shure to provide the LCD hardware with the right ammount of voltage (mostly 5V or 3.3V)
-  --use a strong powersuppy. If you notice LCD fading a bit there is a lack of current.
+  - try to adjust contrast by the screw on the back of the LCD Hardware (I2C Modul)
+  - be shure to provide the LCD hardware with the right ammount of voltage (mostly 5V or 3.3V)
+  - use a strong powersuppy. If you notice LCD fading a bit there is a lack of current.
 Questions can be posed in the Craftbeerpi Usergroup in Facebook or in the repository.
 
-**Fixed Issues**
+## Fixed Issues:
 Now the °C or F is displaed like in CBPi parameters
 If there is a missing Kettle or Fermenter no more faults are thrown.
 
