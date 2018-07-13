@@ -5,6 +5,20 @@
 With this add-on you can display your Brewing steps temperatures on a 20x4 i2c LCD Display.
 In addition you can display the target-temperatur and current-temperature of each fermenter.
 This addon only works with I2C connected LCD Displays.
+
+## Installation
+
+Download and install this plugin via 
+the CraftBeerPi user interface. It is called LCDDisplay.
+After that a reboot is necessary.
+
+## Configuration
+
+At least configure your i2c adress in the parameters menue. Some other
+parameters of the LCD can be changed in the  __init__.py file in the
+/home/pi/craftbeerpi3/modules/plugins/LCDDisplay folder.
+
+
 There are different modes:
 
 **Defaultdisplay**
@@ -38,7 +52,7 @@ If no brewing process is running the LCD Display will show
 - When the heater or cooler of the fermenter is on it will show a symbol.
 A beerglas detects heater is on, * means cooler in on.
 - The remaining time for each fermenter is shown like in weeks, days, hours. 
-- Fermenter mode starts when a fermenter-step of any of the fermenters is starting.
+- Fermenter mode starts when a fermenter-step of any of the fermenters is starting and no brewing step is running(most likely)
 
 Parameter
 ---------
@@ -70,31 +84,23 @@ Here you can change the kettle to be displayed in single mode. The number is the
 kettles starting with 1. Default is kettle 1 (probably the first kettle which was defined in hardware).
 
 
-## Installation
-
-Download and install this plugin via 
-the CraftBeerPi user interface. It is called LCDDisplay.
-After that a reboot is necessary.
-
-## Configuration
-
-At least configure your i2c adress in the parameters menue. Some other
-parameters of the LCD can be changed in the  __init__.py file in the
-/home/pi/craftbeerpi3/modules/plugins/LCDDisplay folder.
 
 ## Hints
 
-Changing a LCD_xxxx parameter in the parameters menue or any
+- Changing a LCD_xxxx parameter in the parameters menue or any
 file in LCDDisplay folder usually requires a reboot.
-Concerning reboot have a look in the comments of the parameters.
-A new fermenter should have a target temperature and at least one step defined.
-It maybe necessary to restart craftbeerpi after adding a new fermenter. 
-Sometimes it lastes a long time till the fermenterstep starts running. 
+- If you need a reboot have a look in the comments of the parameters.
+- A new fermenter should have a target temperature and at least one step defined.
+- It maybe necessary to restart craftbeerpi after adding a new fermenter. 
+- Sometimes it lastes a long time till the fermenterstep starts running. 
 I don't know why this is happening.
-If the address is right but you still can not see letters displayed:
+- If the address is right but you still can not see letters displayed:
   - try to adjust contrast by the screw on the back of the LCD Hardware (I2C Modul)
   - be shure to provide the LCD hardware with the right ammount of voltage (mostly 5V or 3.3V)
   - use a strong powersuppy. If you notice LCD fading a bit there is a lack of current.
+  - use proper connections. Soldering the wires is best for connection. Bad connection can also result in fading the LCD.
+  
+  
 Questions can be posed in the Craftbeerpi Usergroup in Facebook or in the repository.
 
 ## Fixed Issues:
