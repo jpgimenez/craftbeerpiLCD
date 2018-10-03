@@ -89,7 +89,7 @@ kettles starting with 1. Default is kettle 1 (probably the first kettle which wa
 
 - Changing a LCD_xxxx parameter in the parameters menue or any
 file in LCDDisplay folder usually requires a reboot.
-- If you need a reboot have a look in the comments of the parameters.
+- Whether you need a reboot have a look in the comments of the parameters.
 - A new fermenter should have a target temperature and at least one step defined.
 - It maybe necessary to restart craftbeerpi after adding a new fermenter. 
 - Sometimes it lastes a long time till the fermenterstep starts running. 
