@@ -99,11 +99,17 @@ I don't know why this is happening.
   - be shure to provide the LCD hardware with the right ammount of voltage (mostly 5V or 3.3V)
   - use a strong powersuppy. If you notice LCD fading a bit there is a lack of current.
   - use proper connections. Soldering the wires is best for connection. Bad connection can also result in fading the LCD.
-  
-  
+
+
+## Known Problems
+The LCD does not like temperature below 0°C (32°F). It becomes slow and can be damaged like brightness is no more homogen throughout the hole LCD area.
+
+
+## Questions  
 Questions can be posed in the Craftbeerpi Usergroup in Facebook or in the repository.
 
-## Fixed Issues:
+
+## Fixed Issues
 Now the °C or F is displaed like in CBPi parameters
 If there is a missing Kettle or Fermenter no more faults are thrown.
 
