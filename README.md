@@ -106,6 +106,8 @@ I don't know why this is happening.
 ## Known Problems
 The LCD does not like temperature below 0°C (32°F). It becomes slow and can be damaged like brightness is no more homogen throughout the hole LCD area.
 
+When CBPi3 Mesh Steps are active and you restart CBPi3 the display will show nothing. Stop and restart the Mesh steps.
+
 
 ## Questions  
 Questions can be posed in the Craftbeerpi Usergroup in Facebook or in the repository.
