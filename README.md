@@ -12,11 +12,12 @@ This addon only works with I2C connected LCD Displays.
 
 Wireing:
 
-Display       PI
-SDA           Pin 3 GPIO02(SDA1)
-SCL           Pin 5 GPIO03(SDL1)
-VCC           Pin 2 Power 5V
-GND           Pin 6 GND
+Display|       PI
+-------|--------------------
+SDA    |  Pin 3 GPIO02(SDA1)
+SCL    |  Pin 5 GPIO03(SDL1)
+VCC    |  Pin 2 Power 5V
+GND    |  Pin 6 GND
 
 Softwareinstallation:
 
