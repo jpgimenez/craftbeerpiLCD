@@ -10,6 +10,16 @@ This addon only works with I2C connected LCD Displays.
 
 ## Installation
 
+Wireing:
+
+Display       PI
+SDA           Pin 3 GPIO02(SDA1)
+SCL           Pin 5 GPIO03(SDL1)
+VCC           Pin 2 Power 5V
+GND           Pin 6 GND
+
+Softwareinstallation:
+
 Download and install this plugin via 
 the CraftBeerPi user interface. It is called LCDDisplay.
 After that a reboot is necessary.
@@ -107,6 +117,8 @@ I don't know why this is happening.
 The LCD does not like temperature below 0°C (32°F). It becomes slow and can be damaged like brightness is no more homogen throughout the hole LCD area.
 
 When CBPi3 Mesh Steps are active and you restart CBPi3 the display will show nothing. Stop and restart the Mesh steps.
+
+Does not work with stretch: if you start a step LCD will stopp running.
 
 
 ## Questions  
