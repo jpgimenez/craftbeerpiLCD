@@ -12,7 +12,7 @@ from time import gmtime, strftime
 from modules import app, cbpi
 from i2c import CharLCD
 
-# LCDVERSION = '3.8.00'
+# LCDVERSION = '3.9.00'
 # The LCD-library and LCD-driver are taken from RPLCD Project version 1.0.
 # The documentation:   http://rplcd.readthedocs.io/en/stable/ very good and readable.
 # Git is here:         https://github.com/dbrgn/RPLCD.
