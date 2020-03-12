@@ -19,6 +19,10 @@ SCL    |  Pin 5 GPIO03(SDL1)
 VCC    |  Pin 2 Power 5V
 GND    |  Pin 6 GND
 
+I2C Configuration:
+
+Ensure to activate the E2C connection in Raspi configuration.
+
 Softwareinstallation:
 
 Download and install this plugin via 
