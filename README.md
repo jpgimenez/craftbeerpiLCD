@@ -10,7 +10,7 @@ This addon only works with I2C connected LCD Displays.
 
 ## Installation
 
-Wireing:
+**Wireing:**
 
 Display|       PI
 -------|--------------------
@@ -19,11 +19,11 @@ SCL    |  Pin 5 GPIO03(SDL1)
 VCC    |  Pin 2 Power 5V
 GND    |  Pin 6 GND
 
-I2C Configuration:
+**I2C Configuration:**
 
 Ensure to activate the E2C connection in Raspi configuration.
 
-Softwareinstallation:
+**Softwareinstallation:**
 
 Download and install this plugin via 
 the CraftBeerPi user interface. It is called LCDDisplay.
@@ -93,7 +93,7 @@ Changes between the 2 modes. "on" means the Multidisplaymode is on.
 
 **LCD_Refresh:**		  
 In Multidisplay mode this is the time to wait until switching to next displayed kettle. 
-Default is 5 sec.
+Default is 3 sec.
  
 
 **LCD_Singledisplay:** 	  
@@ -109,8 +109,7 @@ file in LCDDisplay folder usually requires a reboot.
 - Whether you need a reboot have a look in the comments of the parameters.
 - A new fermenter should have a target temperature and at least one step defined.
 - It maybe necessary to restart craftbeerpi after adding a new fermenter. 
-- Sometimes it lastes a long time till the fermenterstep starts running. 
-I don't know why this is happening.
+
 - If the address is right but you still can not see letters displayed:
   - try to adjust contrast by the screw on the back of the LCD Hardware (I2C Modul)
   - be shure to provide the LCD hardware with the right ammount of voltage (mostly 5V or 3.3V)
@@ -119,9 +118,7 @@ I don't know why this is happening.
 
 
 ## Known Problems
-The LCD does not like temperature below 0°C (32°F). It becomes slow and can be damaged like brightness is no more homogen throughout the hole LCD area.
-
-When CBPi3 Mesh Steps are active and you restart CBPi3 the display will show nothing. Stop and restart the Mesh steps.
+The LCD hardware does not like temperature below 0°C (32°F). It becomes slow and can be damaged like brightness is no more homogen throughout the hole LCD area.
 
 Does not work with stretch: if you start a step LCD will stopp running.
 
@@ -131,6 +128,7 @@ Questions can be posed in the Craftbeerpi Usergroup in Facebook or in the reposi
 
 
 ## Fixed Issues
-Now the °C or F is displaed like in CBPi parameters
-If there is a missing Kettle or Fermenter no more faults are thrown.
-
+- Now the °C or F is displaed like in CBPi parameters
+- If there is a missing Kettle or Fermenter no more faults are thrown.
+- Sometimes it lastes a long time till the fermenterstep starts running. 
+- When CBPi3 Mesh Steps are active and you restart CBPi3 the display will show nothing. It will at least show the startscreen. Stop and restart the Mesh steps is still nessesary tho show active step.
