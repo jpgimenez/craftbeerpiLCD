@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
 import time
 import logging
 import socket
@@ -12,29 +13,30 @@ from time import gmtime, strftime
 from modules import app, cbpi
 from i2c import CharLCD
 
-# LCDVERSION = '3.9.10'
-# The LCD-library and LCD-driver are taken from RPLCD Project version 1.0.
-# The documentation:   http://rplcd.readthedocs.io/en/stable/ very good and readable.
-# Git is here:         https://github.com/dbrgn/RPLCD.
-# LCD_Address should be something like 0x27, 0x3f etc. See parameters in Craftbeerpi3.
-# To determine address of LCD use comand promt in Raspi: sudo i2cdetect -y 1 or sudo i2cdetect -y 0
-# assembled by JamFfm
+# LCDVERSION = '4.0.00' The LCD-library and LCD-driver are taken from RPLCD Project version 1.0. The documentation:
+# http://rplcd.readthedocs.io/en/stable/ very good and readable. Git is here: https://github.com/dbrgn/RPLCD.
+# LCD_Address should be something like 0x27, 0x3f etc.
+# See parameters in Craftbeerpi3.
+# To determine address of LCD use command prompt in Raspi:
+# sudo i2cdetect -y 1 or sudo i2cdetect -y 0
+# Assembled by JamFfm
 # 17.02.2018 add feature to change Multidisplay <-> Singledisplay without CBPI reboot
 # 17.02.2018 add feature to change Kettle Id for Singledisplay without CBPI reboot
 # 17.02.2018 add feature to change refresh rate for Multidisplay without CBPI reboot
 # 17.02.2018 add feature to change refresh rate for Multidisplay in parameters with choose of value from 1-6s
 # because more than 6s is too much delay in switching actors
 # 18.02.2018 improve stability (no value of a temp sensor)
-# 13.03.2018 display F or C depending on what is selected in parameters-unit#
-# Python 3 migration ready
-# 12.03.2020 start screen instead of blank screen after reboot and active step
+# 13.03.2018 display F or C depending on what is selected in parameters-unit
+# 10.02.2020 Python 3 migration ready
+# 12.03.2020 show start screen instead of blank screen after reboot and active step
 # 12.03.2020 skip delays in Multi mode brewing
-# 12.03.2020 selection of single-mode kettle id improved
-# 15.03.2020 fixed blinking beerglass in single mode
+# 12.03.2020 selection of single-mode kettle id improved 15.03.2020 fixed blinking beerglass in single mode
 # 15.03.2020 skip delays in  fermentation Multi mode
+# 20.03.2020 added ÄÖÜß for A00 Charactermap, Charactermap is
+# selectable in Parameter [A00, A02]. The Character maps are implemented into the LCD by factory. Changed cooling symbol
 
 DEBUG = False  # turn True to show more debug info
-BLINK = False  # start value for blinking the beerglass during heating only single mode
+BLINK = False  # start value for blinking the beerglass during heating only for single mode
 # beerglass symbol
 bierkrug = (
     0b11100,
@@ -48,20 +50,65 @@ bierkrug = (
 )
 # cooler symbol should look like icecubes
 cool = (
-    0b00011,
-    0b11011,
-    0b11000,
+    0b00100,
+    0b10101,
+    0b01110,
+    0b11111,
+    0b01110,
+    0b10101,
+    0b00100,
+    0b00000
+)
+# Ä symbol because in A00 LCD there is no big Ä only small ä- If you use A02 LCD this is not necessary.
+awithdots = (
+    0b10001,
+    0b01110,
+    0b10001,
+    0b10001,
+    0b11111,
+    0b10001,
+    0b10001,
+    0b00000
+)
+# Ö symbol because in A00 LCD there is no big Ö only small ö- If you use A02 LCD this is not necessary.
+owithdots = (
+    0b10001,
+    0b01110,
+    0b10001,
+    0b10001,
+    0b10001,
+    0b10001,
+    0b01110,
+    0b00000
+)
+# Ü symbol because in A00 LCD there is no big Ü only small ü- If you use A02 LCD this is not necessary.
+uwithdots = (
+    0b01010,
+    0b10001,
+    0b10001,
+    0b10001,
+    0b10001,
+    0b10001,
+    0b01110,
+    0b00000
+)
+# ß symbol because in A00 LCD there is no ß If you use A02 LCD this is not necessary.
+esszett = (
     0b00000,
-    0b00110,
-    0b00110,
-    0b11011,
-    0b11011
+    0b00000,
+    0b11100,
+    0b10010,
+    0b10100,
+    0b10010,
+    0b11100,
+    0b10000
 )
 
 
-def lcd(LCDaddress):
+def lcd(LCDaddress, characters):
     try:
-        lcd = CharLCD(i2c_expander='PCF8574', address=LCDaddress, port=1, cols=20, rows=4, dotsize=8, charmap='A00',
+        lcd = CharLCD(i2c_expander='PCF8574', address=LCDaddress, port=1, cols=20, rows=4, dotsize=8,
+                      charmap=characters,
                       auto_linebreaks=True, backlight_enabled=True)
         return lcd
     except:
@@ -75,6 +122,17 @@ def set_lcd_address():
         adr = cbpi.get_config_parameter('LCD_Address', None)
         cbpi.app.logger.info("LCDDisplay  - set_lcd_address added: %s" % adr)
     return adr
+
+
+def set_charmap():
+    charmap = cbpi.get_config_parameter('LCD_Charactermap', None)
+    if charmap is None:
+        cbpi.add_config_parameter('LCD_Charactermap', 'A00', 'select',
+                                  'if characters look strange try to chane this parameter. CBPi reboot required '
+                                  , ['A00', 'A02'])
+        charmap = cbpi.get_config_parameter('LCD_Charactermap', None)
+        cbpi.app.logger.info("LCDDisplay  - LCD_Charactermap added: %s" % charmap)
+    return charmap
 
 
 def set_parameter_refresh():
@@ -144,7 +202,7 @@ def get_version_fo(path):
         return version
 
 
-def show_multidisplay(refresh):
+def show_multidisplay(refresh, charmap):
     s = cbpi.cache.get("active_step")
     for idx, value in cbpi.cache["kettle"].items():
         current_sensor_value = (cbpi.get_sensor_value(value.sensor))
@@ -152,16 +210,17 @@ def show_multidisplay(refresh):
         heater_of_kettle = int(cbpi.cache.get("kettle").get(value.id).heater)
         heater_status = int(cbpi.cache.get("actors").get(heater_of_kettle).state)
 
-        line1 = (u'%s' % (s.name,))[:20]
+        line1 = (u'%s' % (cbidecode(s.name, charmap))[:20])
 
         # line2 when steptimer is running show remaining time and kettlename
         try:
             if s.timer_end is not None:
                 time_remaining = time.strftime(u"%H:%M:%S", time.gmtime(s.timer_end - time.time()))
-                line2 = ((u"%s %s" % (value.name.ljust(12)[:11], time_remaining)).ljust(20)[:20])
+                line2 = ((u"%s %s" % (cbidecode(value.name, charmap).ljust(12)[:11], time_remaining)).ljust(20)[:20])
             else:
-                line2 = ((u'%s' % (value.name,))[:20])
+                line2 = (u'%s' % cbidecode(value.name, charmap))[:20]
         except:
+            line2 = u"no kettle name"
             pass
 
         # line3
@@ -191,7 +250,7 @@ def show_multidisplay(refresh):
     pass
 
 
-def show_singlemode(kettleid1, blink):
+def show_singlemode(kettleid1, blink, charmap):
     s = cbpi.cache.get("active_step")
 
     # read the current temperature of kettle with kettleid1 from parameters
@@ -205,14 +264,16 @@ def show_singlemode(kettleid1, blink):
     # cbpi.app.logger.info("LCDDisplay  - heater status (0=off, 1=on) %s" % (heater_status))
 
     # line1 the stepname
-    line1 = (u'%s' % (s.name,)).ljust(20)[:20]
+    line1 = (u'%s' % (cbidecode(s.name, charmap)).ljust(20)[:20])
 
     # line2 when steptimer is running show remaining time and kettlename
     if s.timer_end is not None:
         time_remaining = time.strftime(u"%H:%M:%S", time.gmtime(s.timer_end - time.time()))
-        line2 = ((u"%s %s" % (cbpi.cache.get("kettle")[kettleid1].name.ljust(12)[:11], time_remaining)).ljust(20)[:20])
+        line2 = ((u"%s %s" % (
+            cbidecode(cbpi.cache.get("kettle")[kettleid1].name, charmap).ljust(12)[:11], time_remaining)).ljust(20)[
+                 :20])
     else:
-        line2 = ((u'%s' % cbpi.cache.get("kettle")[kettleid1].name).ljust(20)[:20])
+        line2 = ((u'%s' % (cbidecode(cbpi.cache.get("kettle")[kettleid1].name, charmap))).ljust(20)[:20])
 
     # line3
     line3 = (u"Targ. Temp:%6.2f%s%s" % (float(cbpi.cache.get("kettle")[kettleid1].target_temp), u"°", lcd_unit)).ljust(
@@ -242,7 +303,7 @@ def show_singlemode(kettleid1, blink):
     lcd.write_string(line4)
 
 
-def show_fermentation_multidisplay(refresh):
+def show_fermentation_multidisplay(refresh, charmap):
     for idx, value in cbpi.cache["fermenter"].items():
         current_sensor_value = (cbpi.get_sensor_value(value.sensor))
         # INFO value = modules.fermenter.Fermenter
@@ -270,20 +331,18 @@ def show_fermentation_multidisplay(refresh):
             fcooler_status = 0
         pass
 
-        line1 = (u'%s' % (value.brewname,))[:20]
-        # line1 = ('%s' % (value.brewname,))[:20]
-        # line1 = line1.decode('utf-8')
-
+        line1 = (u'%s' % (cbidecode(value.brewname, charmap))[:20])
         # line2
         z = 0
+        # todo: line2 = u"no kettle name"
         for key, value1 in cbpi.cache["fermenter_task"].items():
             # INFO value1 = modules.fermenter.FermenterStep
             # cbpi.app.logger.info("LCDDisplay  - value1 %s" % (value1.fermenter_id))
             if value1.timer_start is not None and value1.fermenter_id == value.id:
-                line2 = interval(value.name, (value1.timer_start - time.time()))
+                line2 = interval(cbidecode(value.name, charmap), (value1.timer_start - time.time()))
                 z = 1
             elif z == 0:
-                line2 = (u'%s' % (value.name,))[:20]
+                line2 = (u'%s' % (cbidecode(value.name, charmap))[:20])
             pass
 
         # line3
@@ -326,15 +385,29 @@ def is_fermenter_step_running():
             pass
 
 
-def show_standby(ipdet, cbpi_version):
+def show_standby(ipdet, cbpi_version, charmap):
     lcd.cursor_pos = (0, 0)
     lcd.write_string((u"CraftBeerPi %s" % cbpi_version).ljust(20))
     lcd.cursor_pos = (1, 0)
-    lcd.write_string((u"%s" % (cbpi.get_config_parameter("brewery_name", "No Brewery"))).ljust(20)[:20])
+    lcd.write_string(
+        (u"%s" % (cbidecode(cbpi.get_config_parameter("brewery_name", "No Brewery"), charmap))).ljust(20)[:20])
     lcd.cursor_pos = (2, 0)
     lcd.write_string((u"IP: %s" % ipdet).ljust(20)[:20])
     lcd.cursor_pos = (3, 0)
     lcd.write_string((strftime(u"%Y-%m-%d %H:%M:%S", time.localtime())).ljust(20))
+    pass
+
+
+def cbidecode(string, charmap="A00"):  # Changes some german Letters to be displayed
+    # todo:  check if A00 is used and skip changes if A02 ist used
+    if charmap == "A00":
+        if DEBUG: cbpi.app.logger.info('LCDDisplay  - string: %s' % string)
+        replaced_text = string.replace(u"Ä", u"\x02").replace(u"Ö", u"\x03").replace(u"Ü", u"\x04").replace(u"ß",
+                                                                                                            u"\x05")
+        if DEBUG: cbpi.app.logger.info('LCDDisplay  - replaced_text: %s' % replaced_text)
+        return replaced_text
+    else:
+        return string
     pass
 
 
@@ -377,25 +450,32 @@ def interval(fermentername, seconds):
 def init(cbpi):
     global LCDaddress
     LCDaddress = int(set_lcd_address(), 16)
-    cbpi.app.logger.info('LCDDisplay  - LCD_Address %s %s' % (set_lcd_address(), LCDaddress))
+    cbpi.app.logger.info('LCDDisplay  - LCD_Address %s' % (set_lcd_address()))
+
+    characters = str(set_charmap())
+    cbpi.app.logger.info("LCDDisplay  - character map used %s" % characters)
 
     # This is just for the logfile at start
     refreshlog = float(set_parameter_refresh())
-    cbpi.app.logger.info('LCDDisplay  - Refreshrate %s' % (refreshlog))
+    cbpi.app.logger.info('LCDDisplay  - Refreshrate %s' % refreshlog)
 
     # This is just for the logfile at start
     multidisplaylog = str(set_parameter_multidisplay())
-    cbpi.app.logger.info('LCDDisplay  - Multidisplay %s' % (multidisplaylog))
+    cbpi.app.logger.info('LCDDisplay  - Multidisplay %s' % multidisplaylog)
 
     # This is just for the logfile at start
     id1log = int(set_parameter_id1())
-    cbpi.app.logger.info("LCDDisplay  - Kettlenumber used %s" % (id1log))
+    cbpi.app.logger.info("LCDDisplay  - Kettlenumber used %s" % id1log)
 
     global lcd
     try:
-        lcd = lcd(LCDaddress)
-        lcd.create_char(0, bierkrug)
-        lcd.create_char(1, cool)
+        lcd = lcd(LCDaddress, characters)
+        lcd.create_char(0, bierkrug)                # u"\x00"  -->beerglass symbol
+        lcd.create_char(1, cool)                    # u"\x01"  -->Ice symbol
+        lcd.create_char(2, awithdots)               # u"\x02"  -->Ä
+        lcd.create_char(3, owithdots)               # u"\x03"  -->Ö
+        lcd.create_char(4, uwithdots)               # u"\x04"  -->Ü
+        lcd.create_char(5, esszett)                 # u"\x05"  -->ß
     except:
         cbpi.notify('LCD Address is wrong', 'Change LCD Address in parameters, to detect comand promt in Raspi: sudo '
                                             'i2cdetect -y 1', type='danger', timeout=None)
@@ -428,6 +508,8 @@ def init(cbpi):
 
         ip = set_ip()
 
+        character_map = characters
+
         if stepname is not None and multidisplay_status == "on":
             threadnames = str(threading.enumerate())
             if "<Thread(multidisplay," in threadnames:
@@ -435,7 +517,7 @@ def init(cbpi):
                 pass
             else:
                 t_multidisplay = threading.Thread(target=show_multidisplay, name='multidisplay',
-                                                  args=(refresh_time,))
+                                                  args=(refresh_time, character_map))
                 t_multidisplay.start()
                 if DEBUG: cbpi.app.logger.info("NextionDisplay  - threads Thread multidisplay started")
             pass
@@ -443,10 +525,10 @@ def init(cbpi):
         elif stepname is not None and multidisplay_status == "off":
             global BLINK
             if BLINK is False:
-                show_singlemode(int(set_parameter_id1()), blink=False)
+                show_singlemode(int(set_parameter_id1()), BLINK, character_map)
                 BLINK = True
             else:
-                show_singlemode(int(set_parameter_id1()), blink=True)
+                show_singlemode(int(set_parameter_id1()), BLINK, character_map)
                 BLINK = False
             pass
 
@@ -458,12 +540,12 @@ def init(cbpi):
             else:
                 t_ferm_multidisplay = threading.Thread(target=show_fermentation_multidisplay,
                                                        name='fermentation_multidisplay',
-                                                       args=(refresh_time,))
+                                                       args=(refresh_time, character_map))
                 t_ferm_multidisplay.start()
                 if DEBUG: cbpi.app.logger.info("NextionDisplay  - threads Thread multidisplay started")
             pass
 
         else:
             cbpi_version = (get_version_fo(""))
-            show_standby(ip, cbpi_version)
+            show_standby(ip, cbpi_version, character_map)
         pass
