@@ -128,7 +128,7 @@ def set_charmap():
     charmap = cbpi.get_config_parameter('LCD_Charactermap', None)
     if charmap is None:
         cbpi.add_config_parameter('LCD_Charactermap', 'A00', 'select',
-                                  'if characters look strange try to chane this parameter. CBPi reboot required '
+                                  'if characters look strange try to change this parameter. CBPi reboot required '
                                   , ['A00', 'A02'])
         charmap = cbpi.get_config_parameter('LCD_Charactermap', None)
         cbpi.app.logger.info("LCDDisplay  - LCD_Charactermap added: %s" % charmap)
